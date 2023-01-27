@@ -4,22 +4,21 @@ using namespace std;
 // 1-indexed
 // <segment tree node, init>
 template<typename T, typename S>
-class SegmentTree {
-public:
+struct SegmentTree {
     F f;
     T neut;
     int n;
     vector<T> st;
-    SegmentTree(F f, int n, T val)
+    SegmentTree(F f, T val, int n)
         : f(f), neut(val), st(4 * n + 5, neut), n(n) {}
     SegmentTree(F f, T val, vector<S>& a)
-        : SegmentTree(f, a.size() - 1, val) {  // 1-indexed
+        : SegmentTree(f, val, a.size() - 1) {  // 1-indexed
         build(1, 1, n, a);
     }
     int left(int i) {return i * 2;}
     int right(int i) {return i * 2 + 1;}
     void build(int i, int l, int r, vector<S>& a) {
-        if (l == r) st[i] = a[l];
+        if (l == r) st[i] = T(a[l]);
         else {
             int m = (l + r) / 2;
             build(left(i), l, m, a);
@@ -49,18 +48,4 @@ public:
     void update(int p, T v) {update(1, 1, n, p, v);}
     T query(int l, int r) {return query(1, 1, n, l, r);}
 };
-
-struct Node {
-    int id;
-    int val;
-    Node(): id(0), val(0) {}
-    Node(int val, int id): val(val), id(id) {}
-};
-
-Node Min(const Node& a, const Node& b) {
-    if (a.val < b.val) return a;
-    else return b;
-}
-
-// Usage: SegmentTree<Node, Node> segm_tree_min(
-//            Min, Node(INT_MAX, 0), data);
+// Usage: SegmentTree<Node, ll> st_min(Min, Node(LLONG_MAX), data);
