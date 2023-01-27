@@ -1,18 +1,19 @@
 #include <bits/stdc++.h>
 using namespace std;
+#define F function<T(const T&, const T&)>
 // 1-indexed
-// <function, segment tree node, init>
-template<typename OP, typename T, typename S>
+// <segment tree node, init>
+template<typename T, typename S>
 class SegmentTree {
 public:
-    OP op;
+    F f;
     T neut;
     int n;
     vector<T> st;
-    SegmentTree(OP op, int n, T val)
-        : op(op), neut(val), st(4 * n + 5, neut), n(n) {}
-    SegmentTree(OP op, T val, vector<S>& a)
-        : SegmentTree(op, a.size() - 1, val) {  // 1-indexed
+    SegmentTree(F f, int n, T val)
+        : f(f), neut(val), st(4 * n + 5, neut), n(n) {}
+    SegmentTree(F f, T val, vector<S>& a)
+        : SegmentTree(f, a.size() - 1, val) {  // 1-indexed
         build(1, 1, n, a);
     }
     int left(int i) {return i * 2;}
@@ -23,7 +24,7 @@ public:
             int m = (l + r) / 2;
             build(left(i), l, m, a);
             build(right(i), m + 1, r, a);
-            st[i] = op(st[left(i)], st[right(i)]);
+            st[i] = f(st[left(i)], st[right(i)]);
         }
     }
     void update(int i, int l, int r, int p, T v) {
@@ -32,7 +33,7 @@ public:
             int m = (l + r) / 2;
             if (p <= m) update(left(i), l, m, p, v);
             else update(right(i), m + 1, r, p, v);
-            st[i] = op(st[left(i)], st[right(i)]);
+            st[i] = f(st[left(i)], st[right(i)]);
         }
     }
     T query(int i, int l, int r, int x, int y) {
@@ -40,8 +41,8 @@ public:
         else {
             int m = (l + r) / 2;
             T t = neut;
-            if (x <= m) t = op(t, query(left(i), l, m, x, y));
-            if (m + 1 <= y) t = op(t, query(right(i), m + 1, r, x, y));
+            if (x <= m) t = f(t, query(left(i), l, m, x, y));
+            if (m + 1 <= y) t = f(t, query(right(i), m + 1, r, x, y));
             return t;
         }
     }
@@ -61,7 +62,5 @@ Node Min(const Node& a, const Node& b) {
     else return b;
 }
 
-// Usage: SegmentTree<
-//              function<Node(const Node&, const Node&)>,
-//              Node, Node> 
-//                  segm_tree_min(Min, Node(INT_MAX, 0), data);
+// Usage: SegmentTree<Node, Node> segm_tree_min(
+//            Min, Node(INT_MAX, 0), data);
