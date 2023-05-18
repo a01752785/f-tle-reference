@@ -19,6 +19,7 @@ void recompute(Node* node) {
 }
 
 ll query(Node* node, int l, int r, int x, int y) {
+    if (node == nullptr) return 0;
     if (x <= l && r <= y) return get_value(node);
     else {
         int mid = (l + r) / 2;
